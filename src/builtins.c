@@ -59,6 +59,10 @@ int type_cmd(char **tokens) {
 }
 
 int pwd_cmd(char **tokens) {
+  if (tokens[1] != NULL) {
+    printf("pwd: too many arguments\n");
+    return 0;
+  }
   int size = PATH_LEN;
   char *buf = malloc(sizeof(char) * size);
   char *ptr = NULL;
