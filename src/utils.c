@@ -53,9 +53,20 @@ char **tokenize(const char *const s, char sep) {
   int last_i = 0;
   int i = 0;
   int tokens_i = 0;
-  char **tokens = calloc(NUM_TOKENS, sizeof(char *));
+  size_t capacity = NUM_TOKENS;
+  char **tokens = calloc(capacity, sizeof(char *));
+  if (tokens == NULL)
+    exit(EXIT_FAILURE);
 
   while (s[i] != '\0') {
+
+    if (tokens_i >= capacity) {
+      capacity *= 2;
+      tokens = realloc(tokens, sizeof(char *) * capacity);
+      if (tokens == NULL)
+        exit(EXIT_FAILURE);
+    }
+
     // skip all separators
     while (s[i] != '\0' && s[i] == sep) {
       i++;
@@ -72,6 +83,8 @@ char **tokenize(const char *const s, char sep) {
 
     int length = i - last_i;
     tokens[tokens_i] = calloc(length + 1, sizeof(char));
+    if (tokens[tokens_i] == NULL)
+      exit(EXIT_FAILURE);
     memcpy(tokens[tokens_i], s + last_i, length);
     tokens[tokens_i][length] = '\0';
     tokens_i++;
