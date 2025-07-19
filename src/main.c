@@ -1,19 +1,17 @@
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <unistd.h>
 
 #include "builtins.h"
 #include "constants.h"
 #include "utils.h"
 
-int main()
-{
+int main() {
   setbuf(stdout, NULL);
 
-  while (true)
-  {
+  while (true) {
     printf("$ ");
     // Wait for user input
     char input[COMMAND_LEN];
@@ -31,22 +29,16 @@ int main()
       continue;
 
     int builtin_index = get_builtin_index(tokens);
-    if (builtin_index == -1)
-    {
+    if (builtin_index == -1) {
 
       char *found = find_command_in_path(tokens[0]);
 
-      if (found == NULL)
-      {
+      if (found == NULL) {
         print_invalid(input);
-      }
-      else
-      {
+      } else {
         run_cmd(found, tokens);
       }
-    }
-    else
-    {
+    } else {
       commands_functions[builtin_index](tokens);
     }
   }
