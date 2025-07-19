@@ -56,23 +56,30 @@ char **tokenize(const char *const s, char sep) {
   char **tokens = calloc(NUM_TOKENS, sizeof(char *));
 
   while (s[i] != '\0') {
-    if (s[i] == sep) {
-      tokens[tokens_i] = calloc((i - last_i + 1), sizeof(char));
-      strncpy(tokens[tokens_i], s + last_i, i - last_i);
-      tokens[tokens_i][i - last_i] = '\0';
-      tokens_i++;
-      last_i = i + 1;
+    // skip all separators
+    while (s[i] != '\0' && s[i] == sep) {
+      i++;
+      last_i = i;
     }
-    i++;
+
+    if (s[i] == '\0')
+      break;
+
+    // advance while in a token
+    while (s[i] != '\0' && s[i] != sep) {
+      i++;
+    }
+
+    int length = i - last_i;
+    tokens[tokens_i] = calloc(length + 1, sizeof(char));
+    memcpy(tokens[tokens_i], s + last_i, length);
+    tokens[tokens_i][length] = '\0';
+    tokens_i++;
+    last_i = i;
   }
 
-  if (i != last_i) {
-    tokens[tokens_i] = calloc((i - last_i + 1), sizeof(char));
-    strncpy(tokens[tokens_i], s + last_i, i - last_i);
-    tokens[tokens_i][i - last_i] = '\0';
-    tokens_i++;
-  }
-  tokens[tokens_i + 1] = NULL;
+  tokens[tokens_i] = NULL;
+
   return tokens;
 }
 
