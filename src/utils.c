@@ -89,7 +89,7 @@ char **list_dir(const char *path) {
   }
 
   int i = 0;
-  while (dp = readdir(dir)) {
+  while ((dp = readdir(dir))) {
     contents[i] = malloc(sizeof(char) * PATH_LEN);
     strcpy(contents[i], dp->d_name);
     i++;
