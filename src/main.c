@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "constants.h"
 #include "utils.h"
+#include <stdbool.h>
 
 int main() {
   setbuf(stdout, NULL);
