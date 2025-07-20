@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +50,18 @@ void print_invalid(char *command) {
   printf("%s: command not found\n", command);
 }
 
+void flush_tokens(char ***tokens, const char *const s, int *tokens_i,
+                  int last_i, int length,
+                  enum tokenization_state *current_state) {
+  (*tokens)[*tokens_i] = calloc(length + 1, sizeof(char));
+  if ((*tokens)[*tokens_i] == NULL)
+    exit(EXIT_FAILURE);
+  memcpy((*tokens)[*tokens_i], s + last_i, length);
+  (*tokens)[*tokens_i][length] = '\0';
+  (*tokens_i)++;
+  *current_state = SKIPPING;
+}
+
 char **tokenize(const char *const s, char sep) {
   int last_i = 0;
   int i = 0;
@@ -58,38 +71,59 @@ char **tokenize(const char *const s, char sep) {
   if (tokens == NULL)
     exit(EXIT_FAILURE);
 
-  while (s[i] != '\0') {
+  int quote_start_index = 0;
 
+  enum tokenization_state current_state = SKIPPING;
+  while (s[i] != '\0') {
     if (tokens_i >= capacity) {
       capacity *= 2;
-      tokens = realloc(tokens, sizeof(char *) * capacity);
-      if (tokens == NULL)
+      char **new_tokens = realloc(tokens, sizeof(char *) * capacity);
+      if (new_tokens == NULL)
         exit(EXIT_FAILURE);
+      tokens = new_tokens;
     }
-
-    // skip all separators
-    while (s[i] != '\0' && s[i] == sep) {
-      i++;
-      last_i = i;
-    }
-
-    if (s[i] == '\0')
+    char c = s[i];
+    switch (current_state) {
+    case SKIPPING:
+      if (c == sep) {
+        i++;
+        last_i = i;
+      } else if (c == '"') {
+        quote_start_index = i;
+        i++;
+        last_i = i;
+        current_state = QUOTED;
+      } else {
+        current_state = TOKEN;
+      }
       break;
-
-    // advance while in a token
-    while (s[i] != '\0' && s[i] != sep) {
-      i++;
+    case TOKEN:
+      if (c == sep) {
+        flush_tokens(&tokens, s, &tokens_i, last_i, i - last_i, &current_state);
+      } else {
+        i++;
+      }
+      break;
+    case QUOTED:
+      if (c == '"') {
+        flush_tokens(&tokens, s, &tokens_i, last_i, i - last_i, &current_state);
+        i++;
+      } else {
+        i++;
+      }
+      break;
     }
-
-    int length = i - last_i;
-    tokens[tokens_i] = calloc(length + 1, sizeof(char));
-    if (tokens[tokens_i] == NULL)
-      exit(EXIT_FAILURE);
-    memcpy(tokens[tokens_i], s + last_i, length);
-    tokens[tokens_i][length] = '\0';
-    tokens_i++;
-    last_i = i;
   }
+
+  if (current_state == TOKEN) {
+    flush_tokens(&tokens, s, &tokens_i, last_i, i - last_i, &current_state);
+  } else if (current_state == QUOTED) {
+    fprintf(stderr, "Error: unterminated quote.\n");
+    return NULL;
+  }
+
+  if (tokens_i == 0)
+    return NULL;
 
   tokens[tokens_i] = NULL;
 
