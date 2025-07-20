@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,11 +10,25 @@
 #include "utils.h"
 #include <stdbool.h>
 
+volatile sig_atomic_t sigint = 0;
+
+void handle_sigint(int signo) {
+  sigint = 1;
+  char buf[4] = {'\n', SHELL_PS1, ' ', '\0'};
+  write(STDOUT_FILENO, buf, 3);
+}
+
 int main() {
   setbuf(stdout, NULL);
+  signal(SIGINT, handle_sigint);
 
   while (true) {
-    printf("$ ");
+
+    if (sigint) {
+      sigint = 0;
+      continue;
+    }
+    printf("%c ", SHELL_PS1);
 
     char input[COMMAND_LEN];
     if (fgets(input, COMMAND_LEN, stdin) == NULL) {

@@ -3,6 +3,7 @@
 
 #include "builtins.h"
 
+extern const char SHELL_PS1;
 extern const int NUM_TOKENS;
 extern const int COMMAND_LEN;
 extern const int PATH_LEN;

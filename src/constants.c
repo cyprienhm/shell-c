@@ -1,5 +1,6 @@
 #include "builtins.h"
 
+const char SHELL_PS1 = '$';
 const int NUM_TOKENS = 128;
 const int COMMAND_LEN = 1000;
 const int PATH_LEN = 1000;
