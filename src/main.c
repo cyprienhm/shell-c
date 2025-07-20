@@ -14,9 +14,12 @@ int main() {
 
   while (true) {
     printf("$ ");
-    // Wait for user input
+
     char input[COMMAND_LEN];
-    fgets(input, COMMAND_LEN, stdin);
+    if (fgets(input, COMMAND_LEN, stdin) == NULL) {
+      if (feof(stdin))
+        exit(EXIT_SUCCESS);
+    }
 
     size_t input_len = strlen(input);
     input[input_len - 1] = '\0';
