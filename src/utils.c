@@ -158,11 +158,11 @@ char **list_dir(const char *path) {
   return contents;
 }
 
-int run_cmd(char **tokens) {
+int run_cmd(char *found, char **tokens) {
   pid_t pid = fork();
   int status = 0;
   if (pid == 0) {
-    execvp(tokens[0], tokens);
+    execvp(found, tokens);
     exit(EXIT_FAILURE);
   } else {
     waitpid(pid, &status, 0);
