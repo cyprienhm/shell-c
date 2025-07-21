@@ -65,7 +65,7 @@ int main() {
       if (found == NULL) {
         print_invalid(input);
       } else {
-        run_cmd(input);
+        run_cmd(tokens);
       }
     } else {
       commands_functions[builtin_index](tokens);

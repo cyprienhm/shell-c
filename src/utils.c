@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "constants.h"
 #include "utils.h"
@@ -157,7 +158,14 @@ char **list_dir(const char *path) {
   return contents;
 }
 
-int run_cmd(char *input) {
-  system(input);
+int run_cmd(char **tokens) {
+  pid_t pid = fork();
+  int status = 0;
+  if (pid == 0) {
+    execvp(tokens[0], tokens);
+    exit(EXIT_FAILURE);
+  } else {
+    waitpid(pid, &status, 0);
+  }
   return 0;
 }
