@@ -5,7 +5,6 @@
 
 extern const char SHELL_PS1;
 extern const int NUM_TOKENS;
-extern const int COMMAND_LEN;
 extern const int PATH_LEN;
 extern const int NUM_COMMANDS;
 extern const char *commands[];

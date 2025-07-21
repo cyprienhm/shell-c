@@ -15,6 +15,6 @@ void flush_tokens(char ***tokens, const char *const s, int *tokens_i,
                   enum tokenization_state *current_state);
 char **tokenize(const char *const s, char sep);
 char **list_dir(const char *path);
-int run_cmd(char *executable, char **tokens);
+int run_cmd(char *input);
 
 #endif

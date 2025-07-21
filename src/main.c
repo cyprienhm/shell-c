@@ -30,22 +30,32 @@ int main() {
     }
     printf("%c ", SHELL_PS1);
 
-    char input[COMMAND_LEN];
-    if (fgets(input, COMMAND_LEN, stdin) == NULL) {
+    char *input = NULL;
+    size_t size = 0;
+    ssize_t nread = getline(&input, &size, stdin);
+    if (nread == -1) {
+      free(input);
       if (feof(stdin))
         exit(EXIT_SUCCESS);
+      else if (ferror(stdin)) {
+        clearerr(stdin);
+        continue;
+      } else
+        exit(EXIT_FAILURE);
     }
 
-    size_t input_len = strlen(input);
-    input[input_len - 1] = '\0';
-    input_len--;
+    if (input[nread - 1] == '\n') {
+      input[nread - 1] = '\0';
+    }
 
-    if (input_len == 0)
+    if (nread == 1)
       continue;
 
     char **tokens = tokenize(input, ' ');
-    if (tokens == NULL)
+    if (tokens == NULL) {
+      free(input);
       continue;
+    }
 
     int builtin_index = get_builtin_index(tokens);
     if (builtin_index == -1) {
@@ -55,11 +65,12 @@ int main() {
       if (found == NULL) {
         print_invalid(input);
       } else {
-        run_cmd(found, tokens);
+        run_cmd(input);
       }
     } else {
       commands_functions[builtin_index](tokens);
     }
+    free(input);
   }
   return 0;
 }

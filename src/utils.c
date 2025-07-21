@@ -157,16 +157,7 @@ char **list_dir(const char *path) {
   return contents;
 }
 
-int run_cmd(char *executable, char **tokens) {
-  char *to_run = calloc(COMMAND_LEN, sizeof(char));
-  strcpy(to_run, executable);
-  int i = 1;
-  while (tokens[i] != NULL) {
-    strcat(to_run, " ");
-    strcat(to_run, tokens[i]);
-    i++;
-  }
-  system(to_run);
-  free(to_run);
+int run_cmd(char *input) {
+  system(input);
   return 0;
 }
