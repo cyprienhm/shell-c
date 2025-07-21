@@ -70,6 +70,8 @@ int main() {
     } else {
       commands_functions[builtin_index](tokens);
     }
+    for (int j = 0; tokens[j] != NULL; j++)
+      free(tokens[j]);
     free(input);
   }
   return 0;
